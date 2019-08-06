@@ -1,0 +1,24 @@
+{% extends "form.html" %}
+{% block content %}
+
+<div class="container">
+  <div class="row content">
+    <h1>かわいい判定機です</h1>
+      <h2>HTML何もわからないので人のコードをパクっただけになってしまいました。</h2>
+  </div>
+</div>
+
+
+<div class="container">
+  <div class="row content">
+    <!-- <h1>判定機です</h1> -->
+    <form method="post" enctype="multipart/form-data" action="/predict_page">
+      <div class="fallback">
+        <input name="file" type="file"/>
+      </div>
+      <input type="submit" value="Upload">
+    </form>
+  </div>
+</div>
+
+{% endblock %}

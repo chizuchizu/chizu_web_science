@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF=8">
+    <title>かわいい判定機</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+
+    {{ dropzone.load() }}
+    {{ dropzone.style('border: 2px dashed #0087F7; margin: 10%; min-height: 400px;') }}
+
+    <style media="screen">
+      .content {
+        width: 100%;
+        text-align: center;
+      }
+      .content h1 {
+        width: 100%;
+        margin-top: 20px;
+      }
+      .content form {
+        width: 100%;
+      }
+      .result-content {
+        margin: 10px auto;
+        text-align: center;
+        width: 80%;
+      }
+      p.result {
+        font-size: 30px;
+      }
+      canvas {
+        margin: 20px auto;
+      }
+    </style>
+  </head>
+  <body>
+    {% block content %}
+    {% endblock %}
+
+  </body>
+</html>

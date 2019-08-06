@@ -1,0 +1,78 @@
+import os
+from flask import Flask, request, redirect, url_for, render_template
+from werkzeug.utils import secure_filename
+from flask import send_from_directory
+from keras.models import Sequential, load_model
+from PIL import Image
+from flask_dropzone import Dropzone
+from flask import flash
+import numpy as np
+
+classes = ["オオバコ", "オランダミミナグサ", "カラスノエンドウ", "クローバー", "タンポポ", "タンポポ", "タンポポ",
+           "ツツジ", "ドクダミ", "よくわからない植物", "オオイヌノフグリ", "よくわからない植物2", "菜の花", "菜の花", "桜",
+           "苔", "ヤツデ"]
+num_classes = len(classes)
+image_size = 128
+
+UPLOAD_FOLDER = './uploads'
+ALLOWED_EXTENSIONS = set(['jpg', 'png', 'gif'])
+
+app = Flask(__name__)
+
+app.config.update(
+    UPLOAD_FOLDER=UPLOAD_FOLDER,
+    DROPZONE_MAX_FILES=1,
+    # DROPZONE_REDIRECT_VIEW='predict_page',
+)
+
+dropzone = Dropzone(app)
+
+
+# ファイルのアップロードの可否を判定する
+def allowed_file(filename):
+    # 正しい拡張子が指定されているか
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+@app.route('/', methods=['GET', 'POST'])
+def upload_file():
+    return render_template('index.html')
+
+
+@app.route('/predict_page', methods=['GET', 'POST'])
+def predict_page():
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            flash("ファイルがありません")
+            return redirect(request.url)
+        file = request.files['file']
+        if file.filename == '':
+            flash("ファイルがありません")
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            # サニタイズ処理
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+            model = load_model('model_2019_8_5_1.h5')
+
+            image = Image.open(filepath)
+            image = image.convert("RGB")
+            image = image.resize((image_size, image_size))
+            data = np.array(image)
+
+            X = np.array(data)
+            X = X[np.newaxis, :, :, :]
+
+            result = model.predict([X])[0]
+            predicted = result.argmax()
+            percentage = int(result[predicted] * 100)
+
+            return render_template('predict_page.html', predict=classes[predicted], percentage=percentage,
+                                   result=result)
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
